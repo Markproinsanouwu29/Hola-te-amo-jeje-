@@ -1,0 +1,128 @@
+‎<!DOCTYPE html>
+‎<html lang="es">
+‎<head>
+‎<meta charset="UTF-8">
+‎<title>Para ti</title>
+‎
+‎<style>
+‎
+‎body{
+‎margin:0;
+‎background:black;
+‎overflow:hidden;
+‎}
+‎
+‎canvas{
+‎display:block;
+‎}
+‎
+‎</style>
+‎</head>
+‎
+‎<body>
+‎
+‎<canvas id="canvas"></canvas>
+‎
+‎<script>
+‎
+‎const canvas = document.getElementById("canvas");
+‎const ctx = canvas.getContext("2d");
+‎
+‎canvas.width = window.innerWidth;
+‎canvas.height = window.innerHeight;
+‎
+‎let particles = [];
+‎
+‎function heartShape(t){
+‎return {
+‎x:16*Math.pow(Math.sin(t),3),
+‎y:-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))
+‎};
+‎}
+‎
+‎for(let i=0;i<800;i++){
+‎
+‎let t=Math.random()*Math.PI*2;
+‎let pos=heartShape(t);
+‎
+‎particles.push({
+‎x:Math.random()*canvas.width,
+‎y:Math.random()*canvas.height,
+‎tx:canvas.width/2+pos.x*20,
+‎ty:canvas.height/2+pos.y*20
+‎});
+‎
+‎}
+‎
+‎let phase = 0;
+‎
+‎setTimeout(()=>{phase=1},4000);
+‎
+‎function createTextPoints(text){
+‎
+‎let temp=document.createElement("canvas");
+‎let tctx=temp.getContext("2d");
+‎
+‎temp.width=canvas.width;
+‎temp.height=canvas.height;
+‎
+‎tctx.fillStyle="white";
+‎tctx.font="bold 90px Arial";
+‎tctx.textAlign="center";
+‎tctx.fillText(text,canvas.width/2,canvas.height/2);
+‎
+‎let data=tctx.getImageData(0,0,canvas.width,canvas.height).data;
+‎
+‎let points=[];
+‎
+‎for(let y=0;y<canvas.height;y+=6){
+‎for(let x=0;x<canvas.width;x+=6){
+‎
+‎let i=(y*canvas.width+x)*4;
+‎
+‎if(data[i+3]>128){
+‎points.push({x,y});
+‎}
+‎
+‎}
+‎}
+‎
+‎return points;
+‎
+‎}
+‎
+‎let textPoints=createTextPoints("te amo jeje ");
+‎
+‎function animate(){
+‎
+‎ctx.fillStyle="rgba(0,0,0,0.25)";
+‎ctx.fillRect(0,0,canvas.width,canvas.height);
+‎
+‎ctx.fillStyle="#ff4da6";
+‎
+‎particles.forEach((p,i)=>{
+‎
+‎if(phase===1 && textPoints[i]){
+‎p.tx=textPoints[i].x;
+‎p.ty=textPoints[i].y;
+‎}
+‎
+‎p.x += (p.tx-p.x)*0.04;
+‎p.y += (p.ty-p.y)*0.04;
+‎
+‎ctx.beginPath();
+‎ctx.arc(p.x,p.y,2,0,Math.PI*2);
+‎ctx.fill();
+‎
+‎});
+‎
+‎requestAnimationFrame(animate);
+‎
+‎}
+‎
+‎animate();
+‎
+‎</script>
+‎
+‎</body>
+‎</html>
